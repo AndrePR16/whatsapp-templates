@@ -20,7 +20,9 @@
         <input id="titulo"  type="text" placeholder="Título"  class="p-2 border border-slate-300 rounded">
         <input id="hashtag" type="text" placeholder="hashtag" class="p-2 border border-slate-300 rounded">
         <textarea id="mensaje" rows="3" placeholder="Mensaje (usa {nombre} y/o {producto})" class="p-2 border border-slate-300 rounded"></textarea>
-        <button class="bg-emerald-600 text-white py-2 rounded">Agregar plantilla</button>
+        <button type="submit" class="bg-emerald-600 text-white py-2 rounded">Agregar plantilla</button>
+        <!-- Logro 1 (C14): permite salir del "modo edición" sin guardar cambios -->
+        <button id="btn-cancelar" type="button" class="text-xs text-slate-500 hover:text-slate-700 py-1">Cancelar edición</button>
       </form>
 
       <!-- HU4: generador de mensaje final a partir de una plantilla -->
