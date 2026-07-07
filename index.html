@@ -54,8 +54,22 @@
 
     </div>
 
-    <!-- Columna derecha: HU2 - grid de tarjetas pintado desde el estado -->
-    <ul id="listaPlantillas" class="grid gap-3 sm:grid-cols-2 content-start"></ul>
+    <!-- Columna derecha: buscador (HU4) + estadísticas (HU3) + grid de tarjetas (HU1/HU2) -->
+    <!-- Los tres van dentro del MISMO div para que el grid principal los -->
+    <!-- cuente como UNA sola columna, no tres. -->
+    <div class="grid gap-4 content-start">
+
+      <!-- HU4: buscador que filtra por hashtag mientras el usuario escribe -->
+      <input id="buscador" type="text" placeholder="Filtra por hashtag…"
+             class="w-full p-2 border border-slate-300 rounded-lg">
+
+      <!-- HU3: panel de datos derivados (total y conteo por hashtag) -->
+      <aside id="panel-stats" class="bg-slate-100 rounded-lg p-3"></aside>
+
+      <!-- HU1/HU2: tarjetas pintadas desde el estado (con botones editar/eliminar) -->
+      <ul id="listaPlantillas" class="grid gap-3 sm:grid-cols-2"></ul>
+
+    </div>
 
   </div>
 
