@@ -7,6 +7,12 @@
 
 class Template {
   constructor(titulo, mensaje, hashtag) {
+    // crypto.randomUUID() genera un texto único garantizado (ej: "3fa8...").
+    // Lo necesitamos para saber, en un botón "Eliminar" o "Editar",
+    // sobre CUÁL plantilla exacta actuar (el título podría repetirse,
+    // el id nunca).
+    this.id = crypto.randomUUID();
+
     this.titulo = titulo;     // texto corto que identifica la plantilla
     this.mensaje = mensaje;   // el contenido, puede traer variables como {nombre}
     this.hashtag = hashtag;   // etiqueta normalizada (ej: #ventas)
