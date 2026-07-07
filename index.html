@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plantillas WhatsApp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen p-6">
+  <h1 class="text-3xl font-bold text-center text-slate-800 mb-6">Mis Plantillas</h1>
+
+  <!-- Dos columnas: formulario + generador a la izquierda, tarjetas a la derecha -->
+  <div class="max-w-5xl mx-auto grid gap-6 md:grid-cols-[320px_1fr]">
+
+    <!-- Columna izquierda: acciones -->
+    <div class="grid gap-6 self-start">
+
+      <!-- HU1 + HU3: formulario para crear una plantilla nueva -->
+      <form id="form-plantilla" class="bg-white p-4 rounded-xl shadow grid gap-2">
+        <input id="titulo"  type="text" placeholder="Título"  class="p-2 border border-slate-300 rounded">
+        <input id="hashtag" type="text" placeholder="hashtag" class="p-2 border border-slate-300 rounded">
+        <textarea id="mensaje" rows="3" placeholder="Mensaje (usa {nombre} y/o {producto})" class="p-2 border border-slate-300 rounded"></textarea>
+        <button class="bg-emerald-600 text-white py-2 rounded">Agregar plantilla</button>
+      </form>
+
+      <!-- HU4: generador de mensaje final a partir de una plantilla -->
+      <section id="generador" class="bg-white p-4 rounded-xl shadow grid gap-3">
+        <h2 class="font-bold text-slate-800">✨ Usar plantilla</h2>
+
+        <label class="grid gap-1 text-xs text-slate-500">
+          Plantilla
+          <select id="selector" class="p-2 border border-slate-300 rounded text-slate-800"></select>
+        </label>
+
+        <label class="grid gap-1 text-xs text-slate-500">
+          Nombre real
+          <input id="valorNombre" type="text" placeholder="ej. Ana" class="p-2 border border-slate-300 rounded text-slate-800">
+        </label>
+
+        <!-- Logro 3: segunda variable para reemplazar {producto} -->
+        <label class="grid gap-1 text-xs text-slate-500">
+          Producto (opcional)
+          <input id="valorProducto" type="text" placeholder="ej. Plan Premium" class="p-2 border border-slate-300 rounded text-slate-800">
+        </label>
+
+        <button id="btn-generar" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded transition">Generar</button>
+
+        <!-- Resultado: el mensaje final y el botón copiar -->
+        <div class="bg-slate-50 border border-slate-200 rounded p-3 grid gap-2">
+          <p id="mensaje-final" class="text-sm text-slate-700 whitespace-pre-wrap min-h-[1.5rem]"></p>
+          <button id="btn-copiar" class="justify-self-end text-xs text-emerald-700 hover:text-emerald-800">📋 Copiar</button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Columna derecha: HU2 - grid de tarjetas pintado desde el estado -->
+    <ul id="listaPlantillas" class="grid gap-3 sm:grid-cols-2 content-start"></ul>
+
+  </div>
+
+  <!-- Orden importa: Template.js define la clase ANTES de que app.js la use -->
+  <script src="js/models/Template.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
