@@ -2,9 +2,9 @@
 
 App para crear, guardar y reutilizar plantillas de mensajes de WhatsApp. Proyecto del **Módulo 4**, en construcción a lo largo de las clases 13 a 16.
 
-⚠️ **Todo vive en memoria.** Si recargas la página, se pierden las plantillas creadas. La persistencia con `localStorage` se agrega en la Clase 15.
+✅ **Ya persiste.** Desde la Clase 15, tus plantillas y tu filtro se guardan en `localStorage` y sobreviven a un recargo o cierre de la pestaña.
 
-## ¿Qué hace? (hasta C14)
+## ¿Qué hace? (hasta C15)
 
 1. Crear una plantilla con título, mensaje (puede incluir `{nombre}` y `{producto}`) y hashtag.
 2. Ver todas las plantillas en tarjetas, con su fecha de creación y contador de caracteres.
@@ -14,6 +14,8 @@ App para crear, guardar y reutilizar plantillas de mensajes de WhatsApp. Proyect
 6. **Filtrar** la lista escribiendo un hashtag en el buscador.
 7. Elegir una plantilla, escribir un nombre/producto real y generar el mensaje final con las variables reemplazadas.
 8. Copiar ese mensaje al portapapeles con un clic.
+9. **Persistir todo en el navegador**: plantillas y filtro sobreviven a un recargo (`localStorage`).
+10. **Vaciar** toda la colección de un clic, con un indicador visual del estado de guardado.
 
 ## La clase `Template`
 
@@ -87,6 +89,46 @@ Es una **función pura**: recibe el array de plantillas y devuelve un objeto `{ 
 | `.includes()` | `plantillasVisibles()` (buscador, C14) | Saber si el hashtag contiene el texto que escribió el usuario. |
 | `.replaceAll("{nombre}", valor)` | `generarMensajeFinal()` | Reemplazar todas las apariciones de una variable por su valor real. |
 
+## Persistencia con `localStorage` y JSON (C15)
+
+Toda la lógica de guardado vive en `js/persistence.js`, cargado antes que `app.js` porque `app.js` llama a sus funciones (`guardar()`, `cargar()`).
+
+**Guardar (`guardar()`):** `localStorage` solo puede almacenar texto, pero `state.plantillas` es un array de objetos. Por eso se "serializa" con `JSON.stringify()` antes de guardarlo:
+
+```js
+function guardar() {
+  state.plantillas.length === 0
+    ? localStorage.removeItem(CLAVE)
+    : localStorage.setItem(CLAVE, JSON.stringify(state.plantillas));
+
+  localStorage.setItem(CLAVE_FILTRO, state.filtro ?? "");
+  // ...actualiza el indicador "Guardado ✓" / "Vacío"...
+}
+```
+
+Se usa `removeItem()` en vez de guardar un array vacío `"[]"` cuando no queda ninguna plantilla, para que "Vaciar todo" limpie de verdad la clave del navegador. El filtro, al ya ser texto, se guarda directo, sin `JSON.stringify`.
+
+`guardar()` se llama una sola vez, al final de `render()` — como **todo** cambio de estado (crear, editar, eliminar, filtrar, vaciar) termina en un `render()`, basta ese único punto para mantener siempre sincronizados el estado y lo guardado.
+
+**Cargar (`cargar()`):** al reconstruir el array desde el texto guardado se usa `JSON.parse()`, protegido con `try/catch`:
+
+```js
+function cargar() {
+  const guardado = localStorage.getItem(CLAVE);
+  if (!guardado) return [];
+  try {
+    return JSON.parse(guardado);
+  } catch (error) {
+    console.warn("Datos corruptos en localStorage, empiezo de cero:", error);
+    return [];
+  }
+}
+```
+
+**¿Por qué `try/catch`?** `JSON.parse()` lanza un error si el texto no es JSON válido (por ejemplo, si alguien edita el valor a mano en DevTools y lo deja mal formado). Sin el `try/catch`, ese error se propagaría y rompería toda la app al cargar. Con él, si el parseo falla, la app simplemente registra un aviso en consola y arranca con la lista vacía en vez de mostrar una pantalla rota.
+
+**Detalle importante — las fechas:** JSON no sabe representar objetos `Date`, los convierte a texto plano. Al recargar la página, `plantilla.fecha` deja de ser un `Date` y pasa a ser un string. Por eso, en `render()`, la fecha se reconstruye antes de formatearla: `new Date(plantilla.fecha).toLocaleDateString("es-PE")`, sin importar si la plantilla se acaba de crear (con un `Date` real) o se acaba de cargar desde `localStorage` (con un string).
+
 ## Logros Adicionales implementados (C13)
 
 - **Logro 1 — Contador de caracteres**: cada tarjeta muestra `plantilla.mensaje.length`.
@@ -99,6 +141,29 @@ Es una **función pura**: recibe el array de plantillas y devuelve un objeto `{ 
 - **Logro 2 — Hashtag más usado**: la función `hashtagMasUsado(porTag)` recibe el resultado de `contarPorHashtag()` y devuelve, con `.reduce()`, cuál hashtag tiene más plantillas. Se muestra en el panel de estadísticas como `⭐ Más usado: #hashtag (n)`.
 - **Logro 3 — Confirmar al eliminar**: antes de borrar, se usa `confirm("¿Seguro que quieres eliminar esta plantilla?")`. Solo si el usuario acepta, se llama a `eliminarPlantilla()`. En la Clase 16 se reemplazará por un modal propio.
 
+## Logros Adicionales implementados (C15)
+
+- **Logro 1 — Exportar**: botón "Exportar (consola)" que imprime `JSON.stringify(state.plantillas, null, 2)` — el tercer argumento (`2`) le da sangría, para que el JSON se vea legible en la consola en vez de todo pegado en una línea.
+- **Logro 2 — Contador persistente**: `registrarVisita()` en `persistence.js` guarda, bajo otra clave (`whatsapp-templates-visitas`), cuántas veces se abrió la app. Se suma 1 cada vez que carga la página y se muestra debajo del título ("Abriste esta app N veces").
+- **Logro 3 — Fecha de edición**: al guardar una edición, la plantilla actualizada recibe un campo `editadaEl: new Date()`. Si existe, la tarjeta muestra "✏️ Editada: [fecha]" debajo del mensaje. Al ser parte del objeto, `editadaEl` se persiste junto con el resto de la plantilla.
+
+## Diseño visual
+
+La interfaz sigue una línea "glassmorphism" oscura, inspirada en tarjetas de perfil tipo link-in-bio, aplicada al mundo de quien la construyó (programación / QA / documentación funcional):
+
+- **Paleta**: fondo azul marino (`#0b1220`) con resplandores radiales sutiles y una grilla de líneas finas de fondo, tarjetas de "vidrio" (`.glass` / `.glass-row`: fondo translúcido + `backdrop-filter: blur`), acento celeste (`#38bdf8`) para el header y botones principales, y verde WhatsApp (`#25D366`) reservado para la acción de "Generar" (enviar mensaje), como guiño directo a la app.
+- **Tipografía**: `Space Grotesk` para títulos, `Inter` para texto general y `JetBrains Mono` para hashtags, fechas y el indicador de estado.
+- **Íconos SVG en vez de emojis**: editar, eliminar, copiar, generar, exportar y vaciar usan íconos vectoriales propios (trazo `currentColor`), no emojis — cada uno dentro de un botón circular a color (`.icon-btn`).
+- **Tarjetas de plantilla estilo "fila de perfil"**: cada plantilla se pinta como una fila con un badge circular a color (con el ícono `#`), título, subtítulo (mensaje recortado) y los botones de acción a la derecha — el mismo patrón visual que las filas de LinkedIn/GitHub/WhatsApp de una tarjeta de perfil.
+- **Hashtags con color determinista** (`colorPorHashtag()` / `badgePorHashtag()`): cada hashtag recibe siempre el mismo color (calculado a partir de sus propias letras), tanto en el chip de texto como en el badge del ícono — igual que las etiquetas de un issue tracker (Jira/GitHub Issues).
+
+⚠️ Nota técnica: como los botones de acción ahora tienen un `<svg>` adentro, un clic puede caer en el ícono y no en el `<button>`. Por eso el listener de delegación de eventos usa `evento.target.closest(".btn-editar")` / `.closest(".btn-eliminar")` en vez de revisar `evento.target` directamente — así encuentra el botón correcto sin importar en qué parte exacta del ícono se hizo clic.
+
+**Ajustes visuales posteriores:**
+- El botón **"Cancelar edición"** empieza oculto (clase `hidden` en el HTML) y solo se muestra cuando `cargarEnFormulario()` activa el modo edición; se vuelve a ocultar al guardar los cambios o al pulsar "Cancelar". Es un cambio puramente visual: no toca la lógica de `state.editandoId` del Laboratorio 14.
+- Se quitó el subtítulo de roles bajo el título.
+- El fondo fusiona la grilla/resplandores azules con un guiño directo a WhatsApp: un patrón sutil tileado de burbuja de chat + doble check (✓✓) en verde, apenas visible.
+
 ## Estructura del proyecto
 
 ```
@@ -107,6 +172,7 @@ whatsapp-templates/
 ├── README.md
 └── js/
     ├── app.js              # estado central, render(), lógica del form y del generador
+    ├── persistence.js      # guardar()/cargar() con localStorage + JSON
     └── models/
         └── Template.js     # clase Template
 ```

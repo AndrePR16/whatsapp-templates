@@ -76,6 +76,11 @@ function cargarEnFormulario(id) {
   hashtag.value = plantilla.hashtag;
   state.editandoId = id;
 
+  // Mejora visual: el botón "Cancelar edición" solo tiene sentido mientras
+  // se está editando algo, así que lo mostramos recién aquí (estaba oculto
+  // con la clase "hidden" desde el HTML).
+  document.getElementById("btn-cancelar").classList.remove("hidden");
+
   // Detalle de UX: llevamos el foco al formulario para que el usuario
   // vea de inmediato que ya está editando.
   titulo.focus();
@@ -137,6 +142,51 @@ function plantillasVisibles() {
 }
 
 
+// ---------- Diseño: color determinista por hashtag ----------
+
+// Le da a cada hashtag un color consistente (como las etiquetas de
+// Jira/GitHub Issues), calculado a partir de sus propias letras. El
+// mismo hashtag SIEMPRE cae en el mismo color, sin necesidad de
+// guardarlo en el estado.
+const PALETA_HASHTAG = [
+  "bg-rose-500/15 text-rose-300",
+  "bg-sky-500/15 text-sky-300",
+  "bg-violet-500/15 text-violet-300",
+  "bg-amber-500/15 text-amber-300",
+  "bg-teal-500/15 text-teal-300",
+  "bg-pink-500/15 text-pink-300",
+  "bg-indigo-500/15 text-indigo-300",
+];
+
+// La misma paleta, pero como color SÓLIDO de fondo para el "badge" circular
+// de cada tarjeta (necesita más contraste que el chip de texto).
+const PALETA_BADGE = [
+  "bg-rose-500",
+  "bg-sky-500",
+  "bg-violet-500",
+  "bg-amber-500",
+  "bg-teal-500",
+  "bg-pink-500",
+  "bg-indigo-500",
+];
+
+function indicePorHashtag(hashtag) {
+  let suma = 0;
+  for (let i = 0; i < hashtag.length; i++) {
+    suma += hashtag.charCodeAt(i);
+  }
+  return suma % PALETA_HASHTAG.length;
+}
+
+function colorPorHashtag(hashtag) {
+  return PALETA_HASHTAG[indicePorHashtag(hashtag)];
+}
+
+function badgePorHashtag(hashtag) {
+  return PALETA_BADGE[indicePorHashtag(hashtag)];
+}
+
+
 // ---------- HU2 (C13) + HU1/HU2/HU3/HU4 (C14): render() ----------
 
 const lista = document.getElementById("listaPlantillas");
@@ -155,7 +205,11 @@ function render() {
   lista.innerHTML = "";
 
   plantillasVisibles().forEach(function (plantilla) {
-    const fechaTexto = plantilla.fecha.toLocaleDateString("es-PE");
+    // HU2 (C15): JSON no sabe guardar objetos Date, los convierte a texto.
+    // Al recargar la página, plantilla.fecha ya NO es un objeto Date sino
+    // un string. Por eso lo envolvemos en new Date(...) de nuevo antes de
+    // llamar a .toLocaleDateString(): así funciona recién creada o recién cargada.
+    const fechaTexto = new Date(plantilla.fecha).toLocaleDateString("es-PE");
 
     // Logro 2 (C13): recortar el mensaje si es muy largo, solo para mostrarlo.
     const esLargo = plantilla.mensaje.length > 60;
@@ -163,29 +217,57 @@ function render() {
       ? plantilla.mensaje.slice(0, 60) + "…"
       : plantilla.mensaje;
 
+    // Logro 3 (C15): si la plantilla tiene editadaEl, la mostramos.
+    // El operador ternario decide entre mostrar el texto o una cadena vacía.
+    const textoEditada = plantilla.editadaEl
+      ? `<p class="text-[10px] text-slate-400 mt-1">✏️ Editada: ${new Date(plantilla.editadaEl).toLocaleDateString("es-PE")}</p>`
+      : "";
+
     const li = document.createElement("li");
-    li.className = "bg-white p-4 rounded-lg shadow";
+    li.className = "glass-row rounded-xl p-3 flex flex-col gap-2 sm:col-span-1";
     li.innerHTML = `
-      <div class="flex items-start justify-between gap-2">
-        <strong class="text-slate-800">${plantilla.titulo}</strong>
-        <span class="text-xs text-slate-400 shrink-0">${fechaTexto}</span>
+      <div class="flex items-start gap-3">
+        <!-- Badge circular con el ícono "#", coloreado según el hashtag (Logro visual) -->
+        <div class="icon-badge ${badgePorHashtag(plantilla.hashtag)} text-white">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></svg>
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex items-start justify-between gap-2">
+            <strong class="text-slate-100 truncate">${plantilla.titulo}</strong>
+            <span class="text-[10px] text-slate-500 shrink-0 font-mono-ui">${fechaTexto}</span>
+          </div>
+          <p class="text-sm text-slate-400 mt-0.5">${mensajeMostrado}</p>
+          ${textoEditada}
+        </div>
       </div>
-      <p class="text-sm text-slate-600 mt-1">${mensajeMostrado}</p>
-      <div class="flex items-center justify-between mt-2">
-        <span class="inline-block text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">${plantilla.hashtag}</span>
-        <span class="text-xs text-slate-400">${plantilla.mensaje.length} caracteres</span>
-      </div>
-      <!-- HU1/HU2 (C14): botones de acciones, cada uno con data-id -->
-      <!-- para que la delegación de eventos sepa sobre CUÁL plantilla actuar. -->
-      <div class="flex gap-2 mt-3 pt-2 border-t border-slate-100">
-        <button class="btn-editar text-xs px-2.5 py-1 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 transition" data-id="${plantilla.id}">Editar</button>
-        <button class="btn-eliminar text-xs px-2.5 py-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition" data-id="${plantilla.id}">Eliminar</button>
+
+      <div class="flex items-center justify-between pl-[52px]">
+        <div class="flex items-center gap-2">
+          <span class="inline-block text-[11px] font-mono-ui px-2 py-0.5 rounded-full ${colorPorHashtag(plantilla.hashtag)}">${plantilla.hashtag}</span>
+          <span class="text-[10px] text-slate-500 font-mono-ui">${plantilla.mensaje.length} car.</span>
+        </div>
+        <!-- HU1/HU2 (C14): botones de acciones, cada uno con data-id -->
+        <!-- para que la delegación de eventos sepa sobre CUÁL plantilla actuar. -->
+        <div class="flex gap-1">
+          <button class="btn-editar icon-btn bg-sky-500/10 hover:bg-sky-500/20 text-sky-300" data-id="${plantilla.id}" title="Editar">
+            <svg class="w-3.5 h-3.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-id="${plantilla.id}"><path d="M4 20h4L18.5 9.5a2.121 2.121 0 0 0-3-3L5 17v3z" data-id="${plantilla.id}"/><path d="M13.5 6.5l3 3" data-id="${plantilla.id}"/></svg>
+          </button>
+          <button class="btn-eliminar icon-btn bg-red-500/10 hover:bg-red-500/20 text-red-400" data-id="${plantilla.id}" title="Eliminar">
+            <svg class="w-3.5 h-3.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-id="${plantilla.id}"><path d="M5 7h14" data-id="${plantilla.id}"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" data-id="${plantilla.id}"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" data-id="${plantilla.id}"/></svg>
+          </button>
+        </div>
       </div>`;
     lista.appendChild(li);
   });
 
   renderSelector(); // HU4 (C13): el <select> del generador
   renderStats();    // HU3 (C14): total y conteo por hashtag
+
+  // HU1 (C15): cada vez que render() corre, el estado acaba de cambiar
+  // (se agregó, editó, eliminó o filtró algo). Por eso persistimos aquí,
+  // en un único lugar, en vez de llamar guardar() en cada función suelta.
+  guardar();
 }
 
 // Llena el <select> con una <option> por cada plantilla.
@@ -210,18 +292,18 @@ function renderStats() {
   // en [["#ventas", 2], ["#soporte", 1]] para poder recorrerlo con .map()
   const etiquetas = Object.entries(porTag)
     .map(([hashtag, cantidad]) =>
-      `<span class="text-xs bg-white border border-slate-200 px-2 py-0.5 rounded-full">${hashtag} · ${cantidad}</span>`)
+      `<span class="text-xs font-mono-ui px-2 py-0.5 rounded-full ${colorPorHashtag(hashtag)}">${hashtag} · ${cantidad}</span>`)
     .join("");
 
   // Logro 2 (C14): calculamos y mostramos cuál es el hashtag con más plantillas.
   const masUsado = hashtagMasUsado(porTag);
   const textoMasUsado = masUsado
-    ? `<span class="text-xs text-amber-700">⭐ Más usado: ${masUsado.hashtag} (${masUsado.cantidad})</span>`
+    ? `<span class="text-xs text-amber-700 font-mono-ui">⭐ Más usado: ${masUsado.hashtag} (${masUsado.cantidad})</span>`
     : "";
 
   panelStats.innerHTML = `
     <div class="flex items-center gap-2 flex-wrap">
-      <span class="text-sm font-semibold text-slate-700">${total} plantilla(s)</span>
+      <span class="text-sm font-display font-semibold text-[var(--accent-azul)]">${total} plantilla(s)</span>
       ${etiquetas}
       ${textoMasUsado}
     </div>`;
@@ -237,11 +319,16 @@ function renderStats() {
 // el evento "burbujea" hasta el padre y aquí decidimos qué hacer
 // según en qué elemento exacto se hizo clic (evento.target).
 lista.addEventListener("click", function (evento) {
-  // dataset.id lee el atributo data-id="..." del botón clickeado.
-  const id = evento.target.dataset.id;
+  // Como ahora cada botón tiene un ícono <svg> adentro, un clic puede
+  // "aterrizar" en el SVG (o en un <path> del SVG) y no en el <button>
+  // mismo. .closest(".btn-eliminar") sube por los ancestros del elemento
+  // clickeado hasta encontrar el que tiene esa clase, sin importar en
+  // qué hijo exacto se hizo clic.
+  const botonEliminar = evento.target.closest(".btn-eliminar");
+  const botonEditar = evento.target.closest(".btn-editar");
 
-  // classList.contains() revisa si el elemento clickeado tiene esa clase.
-  if (evento.target.classList.contains("btn-eliminar")) {
+  if (botonEliminar) {
+    const id = botonEliminar.dataset.id;
     // Logro 3 (C14): confirm() muestra un aviso simple del navegador
     // con "Aceptar"/"Cancelar". Solo si el usuario acepta, eliminamos.
     // En C16 esto se reemplazará por un modal propio, más lindo.
@@ -251,8 +338,8 @@ lista.addEventListener("click", function (evento) {
     }
   }
 
-  if (evento.target.classList.contains("btn-editar")) {
-    cargarEnFormulario(id);
+  if (botonEditar) {
+    cargarEnFormulario(botonEditar.dataset.id);
   }
 });
 
@@ -286,11 +373,16 @@ form.addEventListener("submit", function (evento) {
     // Las demás plantillas se devuelven intactas, tal cual estaban.
     state.plantillas = state.plantillas.map(function (plantilla) {
       if (plantilla.id === state.editandoId) {
-        return { ...plantilla, titulo: tituloTexto, mensaje: mensajeTexto, hashtag: hashtagNormalizado };
+        // Logro 3 (C15): además de actualizar los datos, guardamos CUÁNDO
+        // se editó por última vez. new Date() captura el momento actual,
+        // igual que hace "fecha" en el constructor de Template.
+        return { ...plantilla, titulo: tituloTexto, mensaje: mensajeTexto, hashtag: hashtagNormalizado, editadaEl: new Date() };
       }
       return plantilla;
     });
     state.editandoId = null; // salimos del "modo edición"
+    // Mejora visual: ya no estamos editando, así que el botón vuelve a ocultarse.
+    document.getElementById("btn-cancelar").classList.add("hidden");
   } else {
     agregarPlantilla(tituloTexto, mensajeTexto, hashtagNormalizado);
   }
@@ -305,6 +397,8 @@ form.addEventListener("submit", function (evento) {
 document.getElementById("btn-cancelar").addEventListener("click", function () {
   state.editandoId = null;
   form.reset();
+  // Mejora visual: al cancelar, el botón se vuelve a ocultar.
+  this.classList.add("hidden");
 });
 
 
@@ -316,6 +410,24 @@ document.getElementById("buscador").addEventListener("input", function (evento) 
   // ...y volvemos a renderizar. render() usa plantillasVisibles(),
   // que ya sabe filtrar según state.filtro.
   render();
+});
+
+
+// ---------- HU4 (C15): Vaciar toda la colección ----------
+
+document.getElementById("btn-vaciar").addEventListener("click", function () {
+  // No hace falta .filter() ni nada especial: vaciar la colección
+  // es simplemente dejar el array en [].
+  state.plantillas = [];
+  render(); // render() -> guardar(); como no queda nada, removeItem() limpia localStorage
+});
+
+// Logro 1 (C15): JSON.stringify acepta un tercer argumento (el número
+// de espacios de sangría) para imprimir el texto "bonito" y legible,
+// en vez de todo pegado en una sola línea.
+document.getElementById("btn-exportar").addEventListener("click", function () {
+  console.log(JSON.stringify(state.plantillas, null, 2));
+  alert("Tus plantillas se imprimieron en la consola (F12 → Console).");
 });
 
 
@@ -356,5 +468,25 @@ document.getElementById("btn-copiar").addEventListener("click", function () {
 });
 
 
-// ---------- Primer dibujo al cargar la página ----------
+// ---------- Arranque de la app: recuperar lo guardado (C15) ----------
+
+// HU2 + HU3 (C15): cargar() ya viene protegida con try/catch (ver
+// persistence.js), así que si el dato guardado está corrupto, esto
+// simplemente devuelve un array vacío en vez de romper la app.
+state.plantillas = cargar();
+
+// HU5 (C15): recuperamos también el filtro guardado. Como es texto,
+// no necesita JSON.parse. Si nunca se guardó nada, usamos "" (vacío).
+state.filtro = localStorage.getItem(CLAVE_FILTRO) ?? "";
+
+// Reflejamos el filtro recuperado en el input del buscador ANTES de
+// renderizar, para que la pantalla y el estado arranquen sincronizados.
+document.getElementById("buscador").value = state.filtro;
+
+// Logro 2 (C15): sumamos esta apertura al contador y lo mostramos.
+const visitas = registrarVisita();
+document.getElementById("contador-visitas").textContent =
+  `Abriste esta app ${visitas} ${visitas === 1 ? "vez" : "veces"}`;
+
+// Primer dibujo, ya con los datos (si había) recuperados del navegador.
 render();

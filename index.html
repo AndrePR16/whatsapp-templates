@@ -1,56 +1,210 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plantillas WhatsApp</title>
+  <title>Plantillas WhatsApp · Dev/QA</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --wa-verde-brillo: #25D366;
+      /* acento "enviar" tipo WhatsApp */
+      --accent-azul: #38bdf8;
+      /* acento principal del tema oscuro */
+      --accent-azul-2: #818cf8;
+    }
+
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      background-color: #0b1220;
+      background-image:
+        /* Guiño a WhatsApp: burbuja de chat + doble check, tileado y sutil */
+        url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27220%27%20height%3D%27220%27%3E%3Cpath%20d%3D%27M20%2030%20h70%20a10%2010%200%200%201%2010%2010%20v40%20a10%2010%200%200%201%20-10%2010%20h-45%20l-15%2015%20v-15%20h-10%20a10%2010%200%200%201%20-10%20-10%20v-40%20a10%2010%200%200%201%2010%20-10%20z%27%20fill%3D%27none%27%20stroke%3D%27%231c4a44%27%20stroke-width%3D%272%27%20opacity%3D%270.4%27/%3E%3Cpath%20d%3D%27M132%20150%20l8%208%20l16%20-16%27%20fill%3D%27none%27%20stroke%3D%27%2325D366%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20opacity%3D%270.35%27/%3E%3Cpath%20d%3D%27M142%20150%20l8%208%20l16%20-16%27%20fill%3D%27none%27%20stroke%3D%27%2325D366%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20opacity%3D%270.35%27/%3E%3C/svg%3E"),
+        radial-gradient(900px 500px at 10% -10%, rgba(56, 189, 248, 0.16), transparent 60%),
+        radial-gradient(800px 500px at 100% 0%, rgba(37, 211, 102, 0.10), transparent 55%),
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 220px 220px, cover, cover, 42px 42px, 42px 42px;
+      background-repeat: repeat, no-repeat, no-repeat, repeat, repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    h1,
+    h2,
+    .font-display {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+    }
+
+    .font-mono-ui {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    /* Tarjeta "de vidrio" reutilizable, la base de todo el tema oscuro */
+    .glass {
+      background: rgba(17, 24, 39, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .glass-row {
+      background: rgba(30, 41, 59, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(8px);
+      transition: background-color .15s ease, border-color .15s ease;
+    }
+
+    .glass-row:hover {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    /* Insumo de texto sobre fondo oscuro */
+    .input-dark {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+    }
+
+    .input-dark::placeholder {
+      color: #64748b;
+    }
+
+    .input-dark:focus {
+      outline: none;
+      border-color: var(--accent-azul);
+    }
+
+    /* Badge circular de ícono, como los de LinkedIn/GitHub/WhatsApp de referencia */
+    .icon-badge {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color .15s ease;
+    }
+  </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-6">
-  <h1 class="text-3xl font-bold text-center text-slate-800 mb-6">Mis Plantillas</h1>
+
+<body class="pb-10">
+
+  <!-- Header estilo "tarjeta de perfil": avatar con anillo azul, nombre en dos tonos, subtítulo de rol -->
+  <header class="max-w-2xl mx-auto pt-10 pb-6 px-6 text-center">
+    <div
+      class="w-20 h-20 mx-auto rounded-full ring-2 ring-[var(--accent-azul)] bg-slate-800 flex items-center justify-center font-mono-ui text-2xl text-[var(--accent-azul)]">
+      &lt;/&gt;
+    </div>
+    <h1 class="font-display text-2xl font-bold mt-4 text-white">
+      Mis <span class="text-[var(--accent-azul)]">Plantillas</span>
+    </h1>
+    <!-- Logro 2 (C15): contador persistente de aperturas de la app -->
+    <p id="contador-visitas" class="text-xs text-slate-500 font-mono-ui mt-2"></p>
+  </header>
 
   <!-- Dos columnas: formulario + generador a la izquierda, tarjetas a la derecha -->
-  <div class="max-w-5xl mx-auto grid gap-6 md:grid-cols-[320px_1fr]">
+  <div class="max-w-5xl mx-auto grid gap-6 md:grid-cols-[320px_1fr] px-6">
 
     <!-- Columna izquierda: acciones -->
     <div class="grid gap-6 self-start">
 
       <!-- HU1 + HU3: formulario para crear una plantilla nueva -->
-      <form id="form-plantilla" class="bg-white p-4 rounded-xl shadow grid gap-2">
-        <input id="titulo"  type="text" placeholder="Título"  class="p-2 border border-slate-300 rounded">
-        <input id="hashtag" type="text" placeholder="hashtag" class="p-2 border border-slate-300 rounded">
-        <textarea id="mensaje" rows="3" placeholder="Mensaje (usa {nombre} y/o {producto})" class="p-2 border border-slate-300 rounded"></textarea>
-        <button type="submit" class="bg-emerald-600 text-white py-2 rounded">Agregar plantilla</button>
-        <!-- Logro 1 (C14): permite salir del "modo edición" sin guardar cambios -->
-        <button id="btn-cancelar" type="button" class="text-xs text-slate-500 hover:text-slate-700 py-1">Cancelar edición</button>
+      <form id="form-plantilla" class="glass rounded-2xl p-4 grid gap-2 shadow-xl">
+        <input id="titulo" type="text" placeholder="Título" class="input-dark p-2 rounded-lg">
+        <input id="hashtag" type="text" placeholder="hashtag (ej. #bug, #QA, #deploy)"
+          class="input-dark p-2 rounded-lg font-mono-ui text-sm">
+        <textarea id="mensaje" rows="3" placeholder="Mensaje (usa {nombre} y/o {producto})"
+          class="input-dark p-2 rounded-lg"></textarea>
+        <button type="submit"
+          class="flex items-center justify-center gap-2 bg-[var(--accent-azul)] hover:brightness-110 text-slate-900 font-semibold py-2 rounded-lg transition">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" class="w-4 h-4">
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
+          Agregar plantilla
+        </button>
+        <!-- Logro 1 (C14): permite salir del "modo edición" sin guardar cambios. -->
+        <!-- Empieza oculto ("hidden"): solo debe verse cuando el usuario -->
+        <!-- realmente está editando una plantilla (ver cargarEnFormulario en app.js). -->
+        <button id="btn-cancelar" type="button"
+          class="hidden flex items-center justify-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 py-1 transition">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" class="w-3.5 h-3.5">
+            <path d="M6 6l12 12" />
+            <path d="M18 6L6 18" />
+          </svg>
+          Cancelar edición
+        </button>
       </form>
 
       <!-- HU4: generador de mensaje final a partir de una plantilla -->
-      <section id="generador" class="bg-white p-4 rounded-xl shadow grid gap-3">
-        <h2 class="font-bold text-slate-800">✨ Usar plantilla</h2>
+      <section id="generador" class="glass rounded-2xl p-4 grid gap-3 shadow-xl">
+        <h2 class="font-display font-bold text-white flex items-center gap-2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--wa-verde-brillo)" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" class="w-5 h-5">
+            <path d="m12 3 1.9 4.3L18 9l-4.1 1.7L12 15l-1.9-4.3L6 9l4.1-1.7Z" />
+            <path d="M19 15l.8 1.8L22 17l-2.2.9L19 20l-.8-2.1L16 17l2.2-.9Z" />
+          </svg>
+          Usar plantilla
+        </h2>
 
-        <label class="grid gap-1 text-xs text-slate-500">
+        <label class="grid gap-1 text-xs text-slate-400">
           Plantilla
-          <select id="selector" class="p-2 border border-slate-300 rounded text-slate-800"></select>
+          <select id="selector" class="input-dark p-2 rounded-lg"></select>
         </label>
 
-        <label class="grid gap-1 text-xs text-slate-500">
+        <label class="grid gap-1 text-xs text-slate-400">
           Nombre real
-          <input id="valorNombre" type="text" placeholder="ej. Ana" class="p-2 border border-slate-300 rounded text-slate-800">
+          <input id="valorNombre" type="text" placeholder="ej. Ana" class="input-dark p-2 rounded-lg">
         </label>
 
         <!-- Logro 3: segunda variable para reemplazar {producto} -->
-        <label class="grid gap-1 text-xs text-slate-500">
+        <label class="grid gap-1 text-xs text-slate-400">
           Producto (opcional)
-          <input id="valorProducto" type="text" placeholder="ej. Plan Premium" class="p-2 border border-slate-300 rounded text-slate-800">
+          <input id="valorProducto" type="text" placeholder="ej. Plan Premium" class="input-dark p-2 rounded-lg">
         </label>
 
-        <button id="btn-generar" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded transition">Generar</button>
+        <button id="btn-generar"
+          class="flex items-center justify-center gap-2 bg-[var(--wa-verde-brillo)] hover:brightness-110 text-slate-900 font-semibold py-2 rounded-lg transition">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" class="w-4 h-4">
+            <path d="M22 2 11 13" />
+            <path d="M22 2 15 22l-4-9-9-4 20-7z" />
+          </svg>
+          Generar
+        </button>
 
         <!-- Resultado: el mensaje final y el botón copiar -->
-        <div class="bg-slate-50 border border-slate-200 rounded p-3 grid gap-2">
-          <p id="mensaje-final" class="text-sm text-slate-700 whitespace-pre-wrap min-h-[1.5rem]"></p>
-          <button id="btn-copiar" class="justify-self-end text-xs text-emerald-700 hover:text-emerald-800">📋 Copiar</button>
+        <div class="input-dark rounded-lg p-3 grid gap-2">
+          <p id="mensaje-final" class="text-sm text-slate-200 whitespace-pre-wrap min-h-[1.5rem]"></p>
+          <button id="btn-copiar"
+            class="justify-self-end flex items-center gap-1.5 text-xs text-[var(--accent-azul)] hover:text-sky-300 font-mono-ui">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" class="w-3.5 h-3.5">
+              <rect x="9" y="9" width="11" height="11" rx="2" />
+              <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+            </svg>
+            Copiar
+          </button>
         </div>
       </section>
 
@@ -62,21 +216,57 @@
     <div class="grid gap-4 content-start">
 
       <!-- HU4: buscador que filtra por hashtag mientras el usuario escribe -->
-      <input id="buscador" type="text" placeholder="Filtra por hashtag…"
-             class="w-full p-2 border border-slate-300 rounded-lg">
+      <div class="relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round"
+          class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M21 21l-4.3-4.3" />
+        </svg>
+        <input id="buscador" type="text" placeholder="Filtra por hashtag… (ej. #QA)"
+          class="input-dark w-full pl-9 pr-3 py-2 rounded-lg font-mono-ui text-sm">
+      </div>
 
       <!-- HU3: panel de datos derivados (total y conteo por hashtag) -->
-      <aside id="panel-stats" class="bg-slate-100 rounded-lg p-3"></aside>
+      <aside id="panel-stats" class="glass rounded-xl p-3"></aside>
 
       <!-- HU1/HU2: tarjetas pintadas desde el estado (con botones editar/eliminar) -->
       <ul id="listaPlantillas" class="grid gap-3 sm:grid-cols-2"></ul>
+
+      <!-- HU4 (C15): indicador de guardado + botones de acciones -->
+      <div class="glass rounded-xl p-3 flex items-center justify-between">
+        <p id="estado" class="text-xs text-slate-400 bg-slate-800/70 px-2.5 py-1 rounded-full font-mono-ui">Listo</p>
+        <div class="flex gap-2">
+          <!-- Logro 1 (C15): imprime las plantillas en formato JSON legible en consola -->
+          <button id="btn-exportar" title="Exportar en consola"
+            class="icon-btn bg-slate-800/70 hover:bg-slate-700 text-slate-300">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" class="w-4 h-4">
+              <path d="M12 3v12" />
+              <path d="M7 10l5 5 5-5" />
+              <path d="M5 21h14" />
+            </svg>
+          </button>
+          <button id="btn-vaciar" title="Vaciar todo" class="icon-btn bg-red-500/10 hover:bg-red-500/20 text-red-400">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" class="w-4 h-4">
+              <path d="M5 7h14" />
+              <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              <path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" />
+            </svg>
+          </button>
+        </div>
+      </div>
 
     </div>
 
   </div>
 
-  <!-- Orden importa: Template.js define la clase ANTES de que app.js la use -->
+  <!-- Orden importa: Template.js define la clase, persistence.js define -->
+  <!-- guardar()/cargar() ANTES de que app.js las use. -->
   <script src="js/models/Template.js"></script>
+  <script src="js/persistence.js"></script>
   <script src="js/app.js"></script>
 </body>
+
 </html>
