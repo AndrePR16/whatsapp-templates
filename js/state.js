@@ -107,7 +107,22 @@ export function duplicarPlantilla(id) {
 }
 
 
-// ---------- Ordenar la colección (HU4, C16) ----------
+// ---------- HU6 (Proyecto Integrador): favoritos ----------
+
+// Alterna el campo "favorito" de una plantilla puntual, de forma
+// inmutable (igual que editarPlantilla): .map() crea un array nuevo,
+// solo la plantilla que coincide con el id cambia.
+export function toggleFavorito(id) {
+  state.plantillas = state.plantillas.map(function (plantilla) {
+    if (plantilla.id === id) {
+      return { ...plantilla, favorito: !plantilla.favorito };
+    }
+    return plantilla;
+  });
+}
+
+
+// ---------- Ordenar la colección (HU4, C16 + HU6 favoritos) ----------
 
 // .sort() ORDENA MUTANDO el array sobre el que se llama. Por eso
 // primero copiamos con el spread [...plantillas]: así ordenamos la
@@ -115,22 +130,35 @@ export function duplicarPlantilla(id) {
 // El comparador (a, b) devuelve:
 //   negativo -> "a" va antes que "b"
 //   positivo -> "a" va después que "b"
-function ordenar(plantillas) {
-  const copia = [...plantillas];
-
+function comparadorSegunOrden(a, b) {
   if (state.orden === "antiguas") {
-    return copia.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+    return new Date(a.fecha) - new Date(b.fecha);
   }
-
   if (state.orden === "alfabetico") {
     // Logro 2 (C16): orden alfabético con .localeCompare(), que
     // compara texto respetando tildes y mayúsculas correctamente
     // (mejor que usar < / > directamente).
-    return copia.sort((a, b) => a.titulo.localeCompare(b.titulo));
+    return a.titulo.localeCompare(b.titulo);
   }
-
   // "recientes" (valor por defecto): las más nuevas primero.
-  return copia.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+  return new Date(b.fecha) - new Date(a.fecha);
+}
+
+function ordenar(plantillas) {
+  const copia = [...plantillas];
+
+  return copia.sort(function (a, b) {
+    // HU6: las favoritas SIEMPRE van primero, sin importar el criterio
+    // elegido en el selector. Convertimos el booleano a 1/0 para poder
+    // restar: favB - favA pone los "true" (1) antes que los "false" (0).
+    const favA = a.favorito ? 1 : 0;
+    const favB = b.favorito ? 1 : 0;
+    if (favA !== favB) return favB - favA;
+
+    // Si ambas son favoritas (o ninguna lo es), se desempata con
+    // el criterio de orden normal (recientes/antiguas/alfabético).
+    return comparadorSegunOrden(a, b);
+  });
 }
 
 

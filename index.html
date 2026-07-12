@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,17 +7,13 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --wa-verde-brillo: #25D366;
-      /* acento "enviar" tipo WhatsApp */
-      --accent-azul: #38bdf8;
-      /* acento principal del tema oscuro */
-      --accent-azul-2: #818cf8;
+      --wa-verde-brillo: #25D366; /* acento "enviar" tipo WhatsApp */
+      --accent-azul:     #38bdf8; /* acento principal del tema oscuro */
+      --accent-azul-2:   #818cf8;
     }
 
     body {
@@ -27,90 +22,63 @@
       background-image:
         /* Guiño a WhatsApp: burbuja de chat + doble check, tileado y sutil */
         url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27220%27%20height%3D%27220%27%3E%3Cpath%20d%3D%27M20%2030%20h70%20a10%2010%200%200%201%2010%2010%20v40%20a10%2010%200%200%201%20-10%2010%20h-45%20l-15%2015%20v-15%20h-10%20a10%2010%200%200%201%20-10%20-10%20v-40%20a10%2010%200%200%201%2010%20-10%20z%27%20fill%3D%27none%27%20stroke%3D%27%231c4a44%27%20stroke-width%3D%272%27%20opacity%3D%270.4%27/%3E%3Cpath%20d%3D%27M132%20150%20l8%208%20l16%20-16%27%20fill%3D%27none%27%20stroke%3D%27%2325D366%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20opacity%3D%270.35%27/%3E%3Cpath%20d%3D%27M142%20150%20l8%208%20l16%20-16%27%20fill%3D%27none%27%20stroke%3D%27%2325D366%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20opacity%3D%270.35%27/%3E%3C/svg%3E"),
-        radial-gradient(900px 500px at 10% -10%, rgba(56, 189, 248, 0.16), transparent 60%),
-        radial-gradient(800px 500px at 100% 0%, rgba(37, 211, 102, 0.10), transparent 55%),
-        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+        radial-gradient(900px 500px at 10% -10%, rgba(56,189,248,0.16), transparent 60%),
+        radial-gradient(800px 500px at 100% 0%, rgba(37,211,102,0.10), transparent 55%),
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
       background-size: 220px 220px, cover, cover, 42px 42px, 42px 42px;
       background-repeat: repeat, no-repeat, no-repeat, repeat, repeat;
       background-attachment: fixed;
       min-height: 100vh;
     }
 
-    h1,
-    h2,
-    .font-display {
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
-    }
-
-    .font-mono-ui {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-    }
+    h1, h2, .font-display { font-family: 'Space Grotesk', 'Inter', sans-serif; }
+    .font-mono-ui { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
     /* Tarjeta "de vidrio" reutilizable, la base de todo el tema oscuro */
     .glass {
       background: rgba(17, 24, 39, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255,255,255,0.08);
       backdrop-filter: blur(10px);
     }
-
     .glass-row {
       background: rgba(30, 41, 59, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255,255,255,0.06);
       backdrop-filter: blur(8px);
       transition: background-color .15s ease, border-color .15s ease;
     }
-
     .glass-row:hover {
       background: rgba(30, 41, 59, 0.8);
-      border-color: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255,255,255,0.14);
     }
 
     /* Insumo de texto sobre fondo oscuro */
     .input-dark {
       background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255,255,255,0.1);
       color: #e2e8f0;
     }
-
-    .input-dark::placeholder {
-      color: #64748b;
-    }
-
-    .input-dark:focus {
-      outline: none;
-      border-color: var(--accent-azul);
-    }
+    .input-dark::placeholder { color: #64748b; }
+    .input-dark:focus { outline: none; border-color: var(--accent-azul); }
 
     /* Badge circular de ícono, como los de LinkedIn/GitHub/WhatsApp de referencia */
     .icon-badge {
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 2.5rem; height: 2.5rem; border-radius: 0.75rem;
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
-
     .icon-btn {
-      width: 2rem;
-      height: 2rem;
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 2rem; height: 2rem; border-radius: 0.5rem;
+      display: flex; align-items: center; justify-content: center;
       transition: background-color .15s ease;
     }
   </style>
 </head>
-
 <body class="pb-10">
 
   <!-- Header estilo "tarjeta de perfil": avatar con anillo azul, nombre en dos tonos, subtítulo de rol -->
   <header class="max-w-2xl mx-auto pt-10 pb-6 px-6 text-center">
-    <div
-      class="w-20 h-20 mx-auto rounded-full ring-2 ring-[var(--accent-azul)] bg-slate-800 flex items-center justify-center font-mono-ui text-2xl text-[var(--accent-azul)]">
+    <div class="w-20 h-20 mx-auto rounded-full ring-2 ring-[var(--accent-azul)] bg-slate-800 flex items-center justify-center font-mono-ui text-2xl text-[var(--accent-azul)]">
       &lt;/&gt;
     </div>
     <h1 class="font-display text-2xl font-bold mt-4 text-white">
@@ -128,30 +96,18 @@
 
       <!-- HU1 + HU3: formulario para crear una plantilla nueva -->
       <form id="form-plantilla" class="glass rounded-2xl p-4 grid gap-2 shadow-xl">
-        <input id="titulo" type="text" placeholder="Título" class="input-dark p-2 rounded-lg">
-        <input id="hashtag" type="text" placeholder="hashtag (ej. #bug, #QA, #deploy)"
-          class="input-dark p-2 rounded-lg font-mono-ui text-sm">
-        <textarea id="mensaje" rows="3" placeholder="Mensaje (usa {nombre} y/o {producto})"
-          class="input-dark p-2 rounded-lg"></textarea>
-        <button type="submit"
-          class="flex items-center justify-center gap-2 bg-[var(--accent-azul)] hover:brightness-110 text-slate-900 font-semibold py-2 rounded-lg transition">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" class="w-4 h-4">
-            <path d="M12 5v14" />
-            <path d="M5 12h14" />
-          </svg>
+        <input id="titulo"  type="text" placeholder="Título"  class="input-dark p-2 rounded-lg">
+        <input id="hashtag" type="text" placeholder="hashtag (ej. #bug, #QA, #deploy)" class="input-dark p-2 rounded-lg font-mono-ui text-sm">
+        <textarea id="mensaje" rows="3" placeholder="Mensaje (usa {nombre} y/o {producto})" class="input-dark p-2 rounded-lg"></textarea>
+        <button type="submit" class="flex items-center justify-center gap-2 bg-[var(--accent-azul)] hover:brightness-110 text-slate-900 font-semibold py-2 rounded-lg transition">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
           Agregar plantilla
         </button>
         <!-- Logro 1 (C14): permite salir del "modo edición" sin guardar cambios. -->
         <!-- Empieza oculto ("hidden"): solo debe verse cuando el usuario -->
         <!-- realmente está editando una plantilla (ver cargarEnFormulario en app.js). -->
-        <button id="btn-cancelar" type="button"
-          class="hidden flex items-center justify-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 py-1 transition">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" class="w-3.5 h-3.5">
-            <path d="M6 6l12 12" />
-            <path d="M18 6L6 18" />
-          </svg>
+        <button id="btn-cancelar" type="button" class="hidden flex items-center justify-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 py-1 transition">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>
           Cancelar edición
         </button>
       </form>
@@ -159,11 +115,7 @@
       <!-- HU4: generador de mensaje final a partir de una plantilla -->
       <section id="generador" class="glass rounded-2xl p-4 grid gap-3 shadow-xl">
         <h2 class="font-display font-bold text-white flex items-center gap-2">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--wa-verde-brillo)" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" class="w-5 h-5">
-            <path d="m12 3 1.9 4.3L18 9l-4.1 1.7L12 15l-1.9-4.3L6 9l4.1-1.7Z" />
-            <path d="M19 15l.8 1.8L22 17l-2.2.9L19 20l-.8-2.1L16 17l2.2-.9Z" />
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--wa-verde-brillo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m12 3 1.9 4.3L18 9l-4.1 1.7L12 15l-1.9-4.3L6 9l4.1-1.7Z"/><path d="M19 15l.8 1.8L22 17l-2.2.9L19 20l-.8-2.1L16 17l2.2-.9Z"/></svg>
           Usar plantilla
         </h2>
 
@@ -183,26 +135,16 @@
           <input id="valorProducto" type="text" placeholder="ej. Plan Premium" class="input-dark p-2 rounded-lg">
         </label>
 
-        <button id="btn-generar"
-          class="flex items-center justify-center gap-2 bg-[var(--wa-verde-brillo)] hover:brightness-110 text-slate-900 font-semibold py-2 rounded-lg transition">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" class="w-4 h-4">
-            <path d="M22 2 11 13" />
-            <path d="M22 2 15 22l-4-9-9-4 20-7z" />
-          </svg>
+        <button id="btn-generar" class="flex items-center justify-center gap-2 bg-[var(--wa-verde-brillo)] hover:brightness-110 text-slate-900 font-semibold py-2 rounded-lg transition">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
           Generar
         </button>
 
         <!-- Resultado: el mensaje final y el botón copiar -->
         <div class="input-dark rounded-lg p-3 grid gap-2">
           <p id="mensaje-final" class="text-sm text-slate-200 whitespace-pre-wrap min-h-[1.5rem]"></p>
-          <button id="btn-copiar"
-            class="justify-self-end flex items-center gap-1.5 text-xs text-[var(--accent-azul)] hover:text-sky-300 font-mono-ui">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" class="w-3.5 h-3.5">
-              <rect x="9" y="9" width="11" height="11" rx="2" />
-              <path d="M5 15V5a2 2 0 0 1 2-2h10" />
-            </svg>
+          <button id="btn-copiar" class="justify-self-end flex items-center gap-1.5 text-xs text-[var(--accent-azul)] hover:text-sky-300 font-mono-ui">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
             Copiar
           </button>
         </div>
@@ -217,22 +159,15 @@
 
       <!-- HU4: buscador que filtra por hashtag mientras el usuario escribe -->
       <div class="relative">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round"
-          class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-          <circle cx="11" cy="11" r="7" />
-          <path d="M21 21l-4.3-4.3" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+          <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
         </svg>
         <input id="buscador" type="text" placeholder="Filtra por hashtag… (ej. #QA)"
-          class="input-dark w-full pl-9 pr-9 py-2 rounded-lg font-mono-ui text-sm">
+               class="input-dark w-full pl-9 pr-9 py-2 rounded-lg font-mono-ui text-sm">
         <!-- Logro 3 (C16): limpia el buscador y vuelve a mostrar todas las plantillas -->
         <button id="btn-limpiar-filtro" type="button" title="Limpiar filtro"
-          class="icon-btn absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 hover:bg-slate-700/50">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" class="w-3.5 h-3.5 pointer-events-none">
-            <path d="M6 6l12 12" />
-            <path d="M18 6L6 18" />
-          </svg>
+                class="icon-btn absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 hover:bg-slate-700/50">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 pointer-events-none"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>
         </button>
       </div>
 
@@ -254,22 +189,11 @@
         <p id="estado" class="text-xs text-slate-400 bg-slate-800/70 px-2.5 py-1 rounded-full font-mono-ui">Listo</p>
         <div class="flex gap-2">
           <!-- Logro 1 (C15): imprime las plantillas en formato JSON legible en consola -->
-          <button id="btn-exportar" title="Exportar en consola"
-            class="icon-btn bg-slate-800/70 hover:bg-slate-700 text-slate-300">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" class="w-4 h-4">
-              <path d="M12 3v12" />
-              <path d="M7 10l5 5 5-5" />
-              <path d="M5 21h14" />
-            </svg>
+          <button id="btn-exportar" title="Exportar en consola" class="icon-btn bg-slate-800/70 hover:bg-slate-700 text-slate-300">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
           </button>
           <button id="btn-vaciar" title="Vaciar todo" class="icon-btn bg-red-500/10 hover:bg-red-500/20 text-red-400">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" class="w-4 h-4">
-              <path d="M5 7h14" />
-              <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-              <path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" />
-            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/></svg>
           </button>
         </div>
       </div>
@@ -282,18 +206,14 @@
   <!-- Empieza oculto con la clase "hidden"; ui.js lo muestra/oculta según haga falta. -->
   <div id="modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="glass rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-        stroke-linejoin="round" class="w-10 h-10 mx-auto mb-3 text-red-400">
-        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
-        <path d="M12 9v4" />
-        <path d="M12 17h.01" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 mx-auto mb-3 text-red-400">
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+        <path d="M12 9v4"/><path d="M12 17h.01"/>
       </svg>
       <p id="modal-texto" class="text-slate-200 mb-5">¿Seguro?</p>
       <div class="flex gap-2 justify-center">
-        <button id="modal-cancelar"
-          class="px-4 py-2 rounded-lg bg-slate-700/60 text-slate-200 hover:bg-slate-700 transition">Cancelar</button>
-        <button id="modal-confirmar"
-          class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Eliminar</button>
+        <button id="modal-cancelar" class="px-4 py-2 rounded-lg bg-slate-700/60 text-slate-200 hover:bg-slate-700 transition">Cancelar</button>
+        <button id="modal-confirmar" class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Eliminar</button>
       </div>
     </div>
   </div>
@@ -304,5 +224,4 @@
   <!-- carga ya no importa como antes con <script> sueltos. -->
   <script type="module" src="js/app.js"></script>
 </body>
-
 </html>

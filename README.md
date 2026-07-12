@@ -135,7 +135,31 @@ function cargar() {
 - **Logro 2 — Orden alfabético**: tercera opción en el `<select id="orden">` que ordena con `a.titulo.localeCompare(b.titulo)`, respetando tildes y mayúsculas correctamente.
 - **Logro 3 — Limpiar filtro**: botón ✕ dentro del buscador que vacía `state.filtro` y el input de un solo clic, sin borrar letra por letra.
 
-## Historias de Usuario implementadas (resumen, hasta C16)
+## Historias de Usuario propias (Proyecto Integrador, Módulo 4)
+
+Más allá de las HU de los laboratorios, el proyecto integrador suma estas dos:
+
+### HU5: Duplicar plantilla
+*Como usuario, quiero duplicar una plantilla existente, para crear variantes rápidamente sin escribir todo desde cero.*
+
+- **Criterios de aceptación:**
+  - Cada tarjeta tiene un botón "Duplicar".
+  - La copia mantiene el mismo mensaje y hashtag, con el título + " (copia)".
+  - La copia recibe un `id` y una `fecha` nuevos (independiente del original: editarla o borrarla no afecta a la plantilla original).
+  - No pide confirmación: duplicar no es una acción destructiva.
+- **Implementación:** `duplicarPlantilla(id)` en `state.js` busca la plantilla original con `.find()` y crea un `new Template(...)` con sus mismos datos (salvo el título). Al ser una instancia nueva de `Template`, `id` y `fecha` se generan solos en el constructor.
+
+### HU6: Favoritos (anclar plantillas)
+*Como usuario, quiero marcar mis plantillas más importantes como favoritas, para tenerlas siempre ancladas arriba de la lista, sin importar el orden elegido.*
+
+- **Criterios de aceptación:**
+  - Cada tarjeta tiene un ícono de estrella que alterna favorito/no favorito.
+  - Las plantillas favoritas se muestran primero, **siempre**, sin importar si el `<select>` de orden está en "Recientes", "Antiguas" o "Alfabético".
+  - Dentro de cada grupo (favoritas / no favoritas), se respeta el criterio de orden elegido.
+  - El estado de favorito persiste en `localStorage` junto con el resto de la plantilla.
+- **Implementación:** `toggleFavorito(id)` en `state.js` alterna el campo `favorito` de forma inmutable (mismo patrón que `editarPlantilla`, con `.map()` + spread). El verdadero truco está en `ordenar()`: el comparador de `.sort()` primero compara `favorito` (`favB - favA`, así los `true` quedan antes que los `false`) y **solo si empatan** (ambas favoritas o ambas no favoritas) usa el criterio de orden normal como desempate. Visualmente, cada tarjeta favorita lleva además un anillo ámbar sutil (`ring-amber-400/40`) para distinguirse de un vistazo.
+
+## Historias de Usuario implementadas (resumen completo)
 
 | HU | Descripción | Laboratorio |
 |---|---|---|
@@ -156,8 +180,8 @@ function cargar() {
 | HU2 | Estados vacíos (sin datos / sin resultados) | C16 |
 | HU3 | Modularización con ESM | C16 |
 | HU4 | Ordenar por fecha / alfabéticamente | C16 |
-
-> 📌 Las Historias de Usuario propias del Proyecto Integrador (Duplicar y Favoritos) se agregan en ramas separadas (`feature-duplicar`, `feature-favoritos`) sobre esta base.
+| **HU5** | **Duplicar plantilla** | **Proyecto Integrador** |
+| **HU6** | **Favoritos (anclar arriba)** | **Proyecto Integrador** |
 
 ## Logros Adicionales implementados (C13)
 

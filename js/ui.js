@@ -13,6 +13,7 @@ import {
   eliminarPlantilla as eliminarDelEstado,
   editarPlantilla,
   duplicarPlantilla,
+  toggleFavorito,
   normalizarHashtag,
   contarPorHashtag,
   hashtagMasUsado,
@@ -171,7 +172,10 @@ function render() {
         : "";
 
       const li = document.createElement("li");
-      li.className = "glass-row rounded-xl p-3 flex flex-col gap-2 sm:col-span-1";
+      // HU6: las plantillas favoritas llevan un anillo ámbar para
+      // distinguirse de un vistazo, además de ir siempre arriba.
+      const claseFavorito = plantilla.favorito ? "ring-1 ring-amber-400/40" : "";
+      li.className = `glass-row rounded-xl p-3 flex flex-col gap-2 sm:col-span-1 ${claseFavorito}`;
       li.innerHTML = `
         <div class="flex items-start gap-3">
           <div class="icon-badge ${badgePorHashtag(plantilla.hashtag)} text-white">
@@ -192,6 +196,11 @@ function render() {
             <span class="text-[10px] text-slate-500 font-mono-ui">${plantilla.mensaje.length} car.</span>
           </div>
           <div class="flex gap-1">
+            <!-- HU6: alterna favorito. La estrella se pinta rellena (amber-400) -->
+            <!-- si la plantilla ya es favorita, o hueca si no lo es. -->
+            <button class="btn-favorito icon-btn ${plantilla.favorito ? "bg-amber-500/15 text-amber-400" : "bg-slate-700/40 text-slate-400 hover:text-amber-300"}" data-id="${plantilla.id}" title="${plantilla.favorito ? "Quitar de favoritos" : "Marcar como favorita"}">
+              <svg class="w-3.5 h-3.5 pointer-events-none" viewBox="0 0 24 24" fill="${plantilla.favorito ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.1 6-5.3-3-5.3 3 1.1-6-4.5-4.2 6.1-.8Z"/></svg>
+            </button>
             <!-- HU5: duplica la plantilla (no es destructivo, no pide confirmación) -->
             <button class="btn-duplicar icon-btn bg-slate-700/40 hover:bg-slate-700 text-slate-300" data-id="${plantilla.id}" title="Duplicar">
               <svg class="w-3.5 h-3.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
@@ -256,6 +265,7 @@ lista.addEventListener("click", function (evento) {
   const botonEliminar = evento.target.closest(".btn-eliminar");
   const botonEditar = evento.target.closest(".btn-editar");
   const botonDuplicar = evento.target.closest(".btn-duplicar");
+  const botonFavorito = evento.target.closest(".btn-favorito");
 
   if (botonEliminar) eliminarPlantilla(botonEliminar.dataset.id);
   if (botonEditar) cargarEnFormulario(botonEditar.dataset.id);
@@ -263,6 +273,12 @@ lista.addEventListener("click", function (evento) {
   // HU5: duplicar no es destructivo, así que se ejecuta directo, sin modal.
   if (botonDuplicar) {
     duplicarPlantilla(botonDuplicar.dataset.id);
+    render();
+  }
+
+  // HU6: alternar favorito tampoco es destructivo.
+  if (botonFavorito) {
+    toggleFavorito(botonFavorito.dataset.id);
     render();
   }
 });
