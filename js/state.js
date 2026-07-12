@@ -89,6 +89,24 @@ export function hashtagMasUsado(porTag) {
 }
 
 
+// ---------- HU5 (Proyecto Integrador): duplicar una plantilla ----------
+
+// No es una operación destructiva (no borra nada), así que no necesita
+// pasar por el modal de confirmación: se ejecuta directo.
+export function duplicarPlantilla(id) {
+  const original = state.plantillas.find(function (p) {
+    return p.id === id;
+  });
+  if (!original) return;
+
+  // new Template(...) genera un id y una fecha NUEVOS automáticamente
+  // (ver models/Template.js), así que la copia queda totalmente
+  // independiente del original: editarla o borrarla no afecta a la otra.
+  const copia = new Template(original.titulo + " (copia)", original.mensaje, original.hashtag);
+  state.plantillas.push(copia);
+}
+
+
 // ---------- Ordenar la colección (HU4, C16) ----------
 
 // .sort() ORDENA MUTANDO el array sobre el que se llama. Por eso

@@ -12,6 +12,7 @@ import {
   agregarPlantilla,
   eliminarPlantilla as eliminarDelEstado,
   editarPlantilla,
+  duplicarPlantilla,
   normalizarHashtag,
   contarPorHashtag,
   hashtagMasUsado,
@@ -191,6 +192,10 @@ function render() {
             <span class="text-[10px] text-slate-500 font-mono-ui">${plantilla.mensaje.length} car.</span>
           </div>
           <div class="flex gap-1">
+            <!-- HU5: duplica la plantilla (no es destructivo, no pide confirmación) -->
+            <button class="btn-duplicar icon-btn bg-slate-700/40 hover:bg-slate-700 text-slate-300" data-id="${plantilla.id}" title="Duplicar">
+              <svg class="w-3.5 h-3.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            </button>
             <button class="btn-editar icon-btn bg-sky-500/10 hover:bg-sky-500/20 text-sky-300" data-id="${plantilla.id}" title="Editar">
               <svg class="w-3.5 h-3.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L18.5 9.5a2.121 2.121 0 0 0-3-3L5 17v3z"/><path d="M13.5 6.5l3 3"/></svg>
             </button>
@@ -250,9 +255,16 @@ function renderStats() {
 lista.addEventListener("click", function (evento) {
   const botonEliminar = evento.target.closest(".btn-eliminar");
   const botonEditar = evento.target.closest(".btn-editar");
+  const botonDuplicar = evento.target.closest(".btn-duplicar");
 
   if (botonEliminar) eliminarPlantilla(botonEliminar.dataset.id);
   if (botonEditar) cargarEnFormulario(botonEditar.dataset.id);
+
+  // HU5: duplicar no es destructivo, así que se ejecuta directo, sin modal.
+  if (botonDuplicar) {
+    duplicarPlantilla(botonDuplicar.dataset.id);
+    render();
+  }
 });
 
 
