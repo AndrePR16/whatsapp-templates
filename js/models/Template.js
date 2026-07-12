@@ -2,10 +2,14 @@
 // Template.js
 // Modela QUÉ ES una plantilla de WhatsApp.
 // Cada vez que hacemos "new Template(...)" se crea un objeto
-// con estos 4 datos. Esto es HU1: modelar la plantilla.
+// con estos 4 datos. Esto es HU1 (C13): modelar la plantilla.
+//
+// C16: este archivo ahora es un MÓDULO ESM. "export" expone la
+// clase para que cualquier otro archivo pueda traerla con
+// "import { Template } from './models/Template.js'".
 // ============================================================
 
-class Template {
+export class Template {
   constructor(titulo, mensaje, hashtag) {
     // crypto.randomUUID() genera un texto único garantizado (ej: "3fa8...").
     // Lo necesitamos para saber, en un botón "Eliminar" o "Editar",
@@ -23,8 +27,3 @@ class Template {
     this.fecha = new Date();
   }
 }
-
-// No usamos "export" porque este proyecto carga los scripts
-// directamente con <script> en el HTML (sin módulos ES).
-// Al cargarse antes que app.js, la clase Template ya está
-// disponible como una variable global cuando app.js se ejecuta.

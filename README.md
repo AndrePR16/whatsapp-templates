@@ -91,7 +91,7 @@ Es una **función pura**: recibe el array de plantillas y devuelve un objeto `{ 
 
 ## Persistencia con `localStorage` y JSON (C15)
 
-Toda la lógica de guardado vive en `js/persistence.js`, cargado antes que `app.js` porque `app.js` llama a sus funciones (`guardar()`, `cargar()`).
+Toda la lógica de guardado vive en `js/storage.js` (desde C16, un módulo ESM que `importa` el `state` que necesita en vez de depender del orden de los `<script>`).
 
 **Guardar (`guardar()`):** `localStorage` solo puede almacenar texto, pero `state.plantillas` es un array de objetos. Por eso se "serializa" con `JSON.stringify()` antes de guardarlo:
 
@@ -129,6 +129,36 @@ function cargar() {
 
 **Detalle importante — las fechas:** JSON no sabe representar objetos `Date`, los convierte a texto plano. Al recargar la página, `plantilla.fecha` deja de ser un `Date` y pasa a ser un string. Por eso, en `render()`, la fecha se reconstruye antes de formatearla: `new Date(plantilla.fecha).toLocaleDateString("es-PE")`, sin importar si la plantilla se acaba de crear (con un `Date` real) o se acaba de cargar desde `localStorage` (con un string).
 
+## Logros Adicionales implementados (C16)
+
+- **Logro 1 — Cerrar al hacer clic fuera**: el modal se cierra si el clic cae exactamente en el fondo oscuro (`evento.target === modal`) y no en el cuadro blanco de adentro (sus hijos tienen otro `evento.target`).
+- **Logro 2 — Orden alfabético**: tercera opción en el `<select id="orden">` que ordena con `a.titulo.localeCompare(b.titulo)`, respetando tildes y mayúsculas correctamente.
+- **Logro 3 — Limpiar filtro**: botón ✕ dentro del buscador que vacía `state.filtro` y el input de un solo clic, sin borrar letra por letra.
+
+## Historias de Usuario implementadas (resumen, hasta C16)
+
+| HU | Descripción | Laboratorio |
+|---|---|---|
+| HU1 | Modelar la plantilla con `class Template` y estado central | C13 |
+| HU2 | Render desde el estado (`render()`) | C13 |
+| HU3 | Limpiar y normalizar texto (`.trim()`, `.toLowerCase()`) | C13 |
+| HU4 | Generador de mensaje con sustitución de variables | C13 |
+| HU1 | Eliminar con delegación de eventos | C14 |
+| HU2 | Editar sin mutar el estado | C14 |
+| HU3 | Estadísticas con función pura (`contarPorHashtag`) | C14 |
+| HU4 | Filtrar por hashtag | C14 |
+| HU1 | Guardar en `localStorage` (JSON) | C15 |
+| HU2 | Recuperar al abrir la app | C15 |
+| HU3 | Proteger contra datos corruptos (`try/catch`) | C15 |
+| HU4 | Vaciar colección + indicador de estado | C15 |
+| HU5 | Recordar el filtro | C15 |
+| HU1 | Modal de confirmación propio | C16 |
+| HU2 | Estados vacíos (sin datos / sin resultados) | C16 |
+| HU3 | Modularización con ESM | C16 |
+| HU4 | Ordenar por fecha / alfabéticamente | C16 |
+
+> 📌 Las Historias de Usuario propias del Proyecto Integrador (Duplicar y Favoritos) se agregan en ramas separadas (`feature-duplicar`, `feature-favoritos`) sobre esta base.
+
 ## Logros Adicionales implementados (C13)
 
 - **Logro 1 — Contador de caracteres**: cada tarjeta muestra `plantilla.mensaje.length`.
@@ -144,7 +174,7 @@ function cargar() {
 ## Logros Adicionales implementados (C15)
 
 - **Logro 1 — Exportar**: botón "Exportar (consola)" que imprime `JSON.stringify(state.plantillas, null, 2)` — el tercer argumento (`2`) le da sangría, para que el JSON se vea legible en la consola en vez de todo pegado en una línea.
-- **Logro 2 — Contador persistente**: `registrarVisita()` en `persistence.js` guarda, bajo otra clave (`whatsapp-templates-visitas`), cuántas veces se abrió la app. Se suma 1 cada vez que carga la página y se muestra debajo del título ("Abriste esta app N veces").
+- **Logro 2 — Contador persistente**: `registrarVisita()` en `storage.js` guarda, bajo otra clave (`whatsapp-templates-visitas`), cuántas veces se abrió la app. Se suma 1 cada vez que carga la página y se muestra debajo del título ("Abriste esta app N veces").
 - **Logro 3 — Fecha de edición**: al guardar una edición, la plantilla actualizada recibe un campo `editadaEl: new Date()`. Si existe, la tarjeta muestra "✏️ Editada: [fecha]" debajo del mensaje. Al ser parte del objeto, `editadaEl` se persiste junto con el resto de la plantilla.
 
 ## Diseño visual
@@ -164,24 +194,83 @@ La interfaz sigue una línea "glassmorphism" oscura, inspirada en tarjetas de pe
 - Se quitó el subtítulo de roles bajo el título.
 - El fondo fusiona la grilla/resplandores azules con un guiño directo a WhatsApp: un patrón sutil tileado de burbuja de chat + doble check (✓✓) en verde, apenas visible.
 
-## Estructura del proyecto
+## Estructura del proyecto (arquitectura modular ESM, C16)
 
 ```
 whatsapp-templates/
 ├── index.html
 ├── README.md
 └── js/
-    ├── app.js              # estado central, render(), lógica del form y del generador
-    ├── persistence.js      # guardar()/cargar() con localStorage + JSON
+    ├── app.js              # arranque: importa y conecta todo (no exporta nada)
+    ├── state.js            # estado central + funciones puras de datos (export)
+    ├── storage.js          # guardar()/cargar() con localStorage + JSON (export)
+    ├── ui.js                # render(), listeners, modal, tarjetas (export solo render)
     └── models/
-        └── Template.js     # clase Template
+        └── Template.js     # clase Template (export)
 ```
+
+## Módulos ESM (C16)
+
+Hasta la Clase 15, todo el código vivía en 2-3 archivos que se comunicaban por **variables globales**, dependiendo de que `<script>` los cargara en el orden correcto. Desde C16, el proyecto usa **módulos ES (`export`/`import`)**:
+
+- **`index.html`** carga un único script: `<script type="module" src="js/app.js"></script>`. Con `type="module"`, cada archivo tiene su propio ámbito (nada de variables globales) y el **orden ya no importa**: el navegador resuelve el árbol de `import` solo.
+- **`models/Template.js`** exporta la clase `Template`.
+- **`state.js`** exporta el estado central (`state`) y las funciones que leen/derivan datos: `agregarPlantilla`, `eliminarPlantilla`, `editarPlantilla`, `normalizarHashtag`, `contarPorHashtag`, `hashtagMasUsado`, `plantillasVisibles`. No toca el DOM: es puro manejo de datos.
+- **`storage.js`** exporta `CLAVE`, `CLAVE_FILTRO`, `CLAVE_VISITAS`, `guardar`, `cargar`, `registrarVisita`. Importa `state` de `state.js` para saber qué persistir.
+- **`ui.js`** importa de `state.js` y `storage.js` todo lo que necesita, y exporta únicamente `render()` — todo lo demás (los listeners, `eliminarPlantilla` con el modal, `cargarEnFormulario`, las funciones de color por hashtag) queda privado a este archivo, porque nadie más lo necesita.
+- **`app.js`** no exporta nada: solo importa `state`, `cargar` y `render`, y arranca la app.
+
+**¿Por qué separar así?** Cada archivo tiene una única responsabilidad: `state.js` es el "cerebro" de los datos, `storage.js` es la memoria persistente, `ui.js` es lo único que toca la pantalla. Si mañana hay que cambiar `localStorage` por una API real, solo se toca `storage.js`; si hay que cambiar el diseño, solo se toca `ui.js`.
+
+## Modal de confirmación propio (HU1, C16)
+
+Eliminar una plantilla o vaciar toda la colección ya no usa el `confirm()` nativo del navegador: ahora hay un modal propio (HTML + Tailwind) que empieza oculto con la clase `hidden`.
+
+La pieza clave es que la acción a ejecutar se **guarda en una variable** (`accionPendiente`) en vez de ejecutarse directo:
+
+```js
+function pedirConfirmacion(texto, accion) {
+  modalTexto.textContent = texto;
+  accionPendiente = accion;
+  modal.classList.remove("hidden");
+}
+```
+
+Solo si el usuario pulsa "Eliminar" en el cuadro, se ejecuta `accionPendiente()`. Esto hace que **el mismo modal sirva para cualquier acción destructiva** (eliminar una plantilla puntual o vaciar todas), sin duplicar el cuadro de diálogo.
+
+## Estados vacíos (HU2, C16)
+
+`render()` distingue dos situaciones que antes se veían igual (una lista en blanco):
+
+- **No hay ninguna plantilla creada todavía** → `"Aún no tienes plantillas. ¡Crea la primera! 🚀"`
+- **Hay plantillas, pero el filtro actual no encuentra ninguna** → `"No se encontraron plantillas con ese filtro."`
+
+La diferencia se calcula comparando `state.plantillas.length` (el total real) contra `plantillasVisibles().length` (lo que hay que mostrar tras filtrar y ordenar).
+
+## Ordenar la colección (HU4, C16)
+
+Un `<select id="orden">` permite elegir entre "Más recientes", "Más antiguas" y "Alfabético". El orden se guarda en `state.orden` y se aplica dentro de `plantillasVisibles()`, **después** de filtrar:
+
+```js
+function ordenar(plantillas) {
+  const copia = [...plantillas]; // .sort() muta: copiamos antes de ordenar
+  if (state.orden === "antiguas")    return copia.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+  if (state.orden === "alfabetico")  return copia.sort((a, b) => a.titulo.localeCompare(b.titulo));
+  return copia.sort((a, b) => new Date(b.fecha) - new Date(a.fecha)); // "recientes" (por defecto)
+}
+```
+
+`.sort()` **muta** el array sobre el que se llama, por eso siempre se copia primero con el spread `[...plantillas]` — el mismo principio de inmutabilidad usado en el CRUD de la Clase 14.
 
 ## Cómo correrlo
 
+⚠️ **Importante**: como el proyecto usa módulos ESM (`type="module"`), **no funciona abriendo `index.html` con doble clic** (protocolo `file://`). Necesitas un servidor local:
+
 1. Clona el repositorio.
-2. Ábrelo con **Live Server** (extensión de VS Code) o cualquier servidor estático.
-3. Abre `index.html` en el navegador.
+2. Ábrelo con **Live Server** (extensión de VS Code) o corre `python -m http.server` en la carpeta del proyecto.
+3. Entra a `index.html` a través del servidor (`http://localhost:...`).
+
+En GitHub Pages funciona sin ningún problema, porque ya sirve los archivos por HTTP.
 
 ## Despliegue
 

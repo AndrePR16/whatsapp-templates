@@ -224,8 +224,24 @@
           <path d="M21 21l-4.3-4.3" />
         </svg>
         <input id="buscador" type="text" placeholder="Filtra por hashtag… (ej. #QA)"
-          class="input-dark w-full pl-9 pr-3 py-2 rounded-lg font-mono-ui text-sm">
+          class="input-dark w-full pl-9 pr-9 py-2 rounded-lg font-mono-ui text-sm">
+        <!-- Logro 3 (C16): limpia el buscador y vuelve a mostrar todas las plantillas -->
+        <button id="btn-limpiar-filtro" type="button" title="Limpiar filtro"
+          class="icon-btn absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 hover:bg-slate-700/50">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" class="w-3.5 h-3.5 pointer-events-none">
+            <path d="M6 6l12 12" />
+            <path d="M18 6L6 18" />
+          </svg>
+        </button>
       </div>
+
+      <!-- HU4 (C16): ordenar la colección por fecha (o alfabéticamente, Logro 2) -->
+      <select id="orden" class="input-dark w-full p-2 rounded-lg text-sm">
+        <option value="recientes">Más recientes primero</option>
+        <option value="antiguas">Más antiguas primero</option>
+        <option value="alfabetico">Alfabético (A-Z)</option>
+      </select>
 
       <!-- HU3: panel de datos derivados (total y conteo por hashtag) -->
       <aside id="panel-stats" class="glass rounded-xl p-3"></aside>
@@ -262,11 +278,31 @@
 
   </div>
 
-  <!-- Orden importa: Template.js define la clase, persistence.js define -->
-  <!-- guardar()/cargar() ANTES de que app.js las use. -->
-  <script src="js/models/Template.js"></script>
-  <script src="js/persistence.js"></script>
-  <script src="js/app.js"></script>
+  <!-- HU1 (C16): modal de confirmación propio, reemplaza el confirm() nativo. -->
+  <!-- Empieza oculto con la clase "hidden"; ui.js lo muestra/oculta según haga falta. -->
+  <div id="modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+        stroke-linejoin="round" class="w-10 h-10 mx-auto mb-3 text-red-400">
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+        <path d="M12 9v4" />
+        <path d="M12 17h.01" />
+      </svg>
+      <p id="modal-texto" class="text-slate-200 mb-5">¿Seguro?</p>
+      <div class="flex gap-2 justify-center">
+        <button id="modal-cancelar"
+          class="px-4 py-2 rounded-lg bg-slate-700/60 text-slate-200 hover:bg-slate-700 transition">Cancelar</button>
+        <button id="modal-confirmar"
+          class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- C16: un solo script, con type="module". El navegador resuelve -->
+  <!-- solo, a través de los "import" de app.js, todos los demás archivos -->
+  <!-- (state.js, storage.js, ui.js, models/Template.js). El orden de -->
+  <!-- carga ya no importa como antes con <script> sueltos. -->
+  <script type="module" src="js/app.js"></script>
 </body>
 
 </html>
